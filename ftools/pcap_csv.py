@@ -95,8 +95,8 @@ def get_tcp_field_set():
 	fields += ' -R "(ip.proto == 6)" -2 '
 	return fields
 
-def execute_tshark(tshark_command, shell=True):
-	call(tshark_command, shell)
+def execute_tshark(tshark_command):
+	call(tshark_command, shell=True)
 
 
 def main():
@@ -110,9 +110,9 @@ def main():
 	print(tshark_command)
 
 	# EXECUTE COMMAND
-	execute_tshark(tshark_command, True)
+	execute_tshark(tshark_command)
 
-	#out = check_output("type pcap2csv.py", shell=True)
+	#out = check_output("type pcap_csv.py", shell=True)
 	#print(out.decode(encoding='utf-8'))
 
 
