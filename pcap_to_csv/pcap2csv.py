@@ -11,9 +11,9 @@ def build_tshark_command(tshark_path, input_file, output_file, fields, header):
 
 	# ADD OUTPUT MODIFIERS
 	if header == 1:
-		result += " -T fields -E header=y -E separator=, -E occurrence=a -E quote=d -t u "
+		result += " -T fields -E header=y -E separator=, -E occurrence=a -E quote=n -t u "
 	else:
-		result += " -T fields -E header=n -E separator=, -E occurrence=a -E quote=d -t u "
+		result += " -T fields -E header=n -E separator=, -E occurrence=a -E quote=n -t u "
 
 	# ADD FIELDS
 	result += fields
@@ -24,7 +24,7 @@ def build_tshark_command(tshark_path, input_file, output_file, fields, header):
 	return result
 
 
-def add_filed(fields, field_cat, field_name):
+def add_field(fields, field_cat, field_name):
 	""" ADDS FIELD BASED ON CATEGORY AND NAME"""
 	ip = {
 		"src": " -e ip.src",
@@ -38,7 +38,8 @@ def add_filed(fields, field_cat, field_name):
 	}
 	frame = {
 		"time": " -e frame.time_epoch",
-		"len": " -e frame.len"
+		"len": " -e frame.len",
+	    "num": "-e frame.number"
 	}
 
 	if field_cat == "ip":
@@ -69,6 +70,8 @@ def add_filed(fields, field_cat, field_name):
 			fields += frame["time"]
 		elif field_name == "len":
 			fields += frame["len"]
+		elif field_name == "num":
+			fields += frame["num"]
 		else:
 			print("Error. Adding", field_cat, "field unsuccessful. No such field: ", field_name)
 
@@ -77,15 +80,16 @@ def add_filed(fields, field_cat, field_name):
 
 def get_tcp_field_set():
 	""" CREATES COLLECTION OF FIELDS COMMON FOR TCP PROTOCOL """
-	fields = " "
-	fields = add_filed(fields, "ip", "src")
-	fields = add_filed(fields, "ip", "dst")
-	fields = add_filed(fields, "ip", "ttl")
-	fields = add_filed(fields, "tcp", "src")
-	fields = add_filed(fields, "tcp", "dst")
-	fields = add_filed(fields, "tcp", "flags")
-	fields = add_filed(fields, "frame", "time")
-	fields = add_filed(fields, "frame", "len")
+	fields = ""
+	fields = add_field(fields, "frame", "num")
+	fields = add_field(fields, "frame", "time")
+	fields = add_field(fields, "frame", "len")
+	fields = add_field(fields, "ip", "src")
+	fields = add_field(fields, "ip", "dst")
+	fields = add_field(fields, "tcp", "src")
+	fields = add_field(fields, "tcp", "dst")
+	fields = add_field(fields, "ip", "ttl")
+	fields = add_field(fields, "tcp", "flags")
 
 	# LIMIT TO TCP ONLY
 	fields += ' -R "(ip.proto == 6)" -2 '
