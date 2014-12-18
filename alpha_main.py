@@ -2,6 +2,7 @@
 from ftools import csv_list as c2l
 from ftools import pcap_csv as p2c
 import random
+import matplotlib
 
 
 def process_tcp(tshark_path):
@@ -11,8 +12,8 @@ def process_tcp(tshark_path):
 	:return:
 	"""
 
-	input = "D:\\1.pcap"
-	output = "D:\\test.csv"
+	input = "D:\\2.pcap"
+	output = "D:\\test2.csv"
 
 	# PREPARING FOR EXECUTION
 	tshark_command = p2c.build_tshark_command(tshark_path, input, output, p2c.get_tcp_field_set(), 0)

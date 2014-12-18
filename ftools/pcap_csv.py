@@ -102,8 +102,8 @@ def execute_tshark(tshark_command):
 def main():
 
 	tshark_path = "D:\\Apps\\Wireshark\\tshark.exe"
-	input = "D:\\1.pcap"
-	output = "D:\\test.csv"
+	input = "D:\\2.pcap"
+	output = "D:\\test2.csv"
 
 	tshark_command = build_tshark_command(tshark_path, input, output, get_tcp_field_set(), 0)
 

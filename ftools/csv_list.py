@@ -52,7 +52,7 @@ def print_list_of_lists(list_of_lists):
 
 def main():
 	data = []
-	input = "D:\\test.csv"
+	input = "D:\\test2.csv"
 	headers, data = parse_file(input, False)
 
 	#print_list_of_lists(data)
