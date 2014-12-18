@@ -144,16 +144,65 @@ def build_2d(data, attribute_1, attribute_2):
 	xs = []
 	ys = []
 	for row in data:
-		xs.append(row[attribute_1])
-		ys.append(row[attribute_2])
+		x = -1
+		y = -1
+		try:
+			x = int(row[attribute_1])
+			y = int(row[attribute_2])
+		except:
+			pass
+		if x is not -1 and y is not -1:
+			xs.append(row[attribute_1])
+			ys.append(row[attribute_2])
 
 	return xs, ys
+
+def build_2d_with_number_of_packets_per_pair(data, attribute_1, attribute_2):
+	xs = []
+	ys = []
+	sizes = []
+	unique_pairs = []
+
+	# PARSING DATA
+	for row in data:
+		x = -1
+		y = -1
+		# CHECKING IF CONVERSION TO INT IS POSSIBLE
+		try:
+			x = int(row[attribute_1])
+			y = int(row[attribute_2])
+		except:
+			pass
+
+		# ADDING TO UNIQUE PAIRS OR INCREMENTING COUNTER
+		if x is not -1 and y is not -1:
+			check = False
+			index = 0
+			for pair in unique_pairs:
+				if pair[0] == row[attribute_1] and pair[1] == row[attribute_2]:
+					check = True
+				index += 1
+
+			if check == True:
+				unique_pairs[index-1][2] += 1
+			else:
+				unique_pairs.append([row[attribute_1], row[attribute_2], 1])
+
+	# GENERATING ARRAYS
+	for pair in unique_pairs:
+		xs.append(pair[0])
+		ys.append(pair[1])
+		sizes.append(pair[2])
+
+	return xs, ys, sizes
 
 def main():
 	random.seed()
 	input_directory = "D:\\Poligon\\input\\"
 	output_directory = "D:\\Poligon\\output\\"
-	input_file = "split_00000_20120316133000.pcap"
+	input_file = "smaller_00000_20120316133000.pcap"
+	input_file2 = "smaller_00001_20120316133058.pcap"
+
 	output_file = "test1.csv"
 	image_output_name = "plotted"
 	image_output_format = ".png"
@@ -161,17 +210,27 @@ def main():
 
 
 	# PROCESSING TCP
-	headers, data = process_tcp(tshark_path, input_directory + input_file, output_directory + output_file, False)
+	headers, data = process_tcp(tshark_path, input_directory + input_file2, output_directory + output_file, True)
 
 	# BUILDING 2D DATA
-	xs, ys = build_2d(data, "sport", "deport")
+	#xs, ys = build_2d(data, "sport", "deport")
 
-	print(xs)
+	xs, ys, sizes = build_2d_with_number_of_packets_per_pair(data, "sport", "deport")
+
 	# PLOTTING DATA
 	#plotter.plot(xs, ys, "circle", "r", 0.4)
+	#plotter.set_axis_limit(10000,10000)
+	# PLOTTING DATA WITH MARKER SIZES
+	plotter.plot_with_sizes(xs, ys, sizes, "circle", "r", 0.4)
+
+	with open(output_directory + "l.log", "w") as f:
+		for i in range(len(xs)):
+			f.write(str(xs[i]) + "-" + str(ys[i]) + " -> " + str(sizes[i]) + "\n")
+
+
 
 	# SAVING IMAGE
-	#plotter.save_img(output_directory + image_output_name + image_output_format)
+	plotter.save_img(output_directory + image_output_name + image_output_format)
 
 if __name__ == "__main__":
 	main()

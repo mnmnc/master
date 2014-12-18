@@ -22,6 +22,23 @@ def plot(xlist, ylist, marker_style='circle', def_color="r", def_alpha=0.5):
 		plt.plot(xlist, ylist, def_color+'o', alpha=def_alpha)
 
 
+def plot_with_sizes(xlist, ylist, sizes, marker_style='circle', def_color="r", def_alpha=0.5):
+	if marker_style == "circle":
+		plt.scatter(xlist, ylist, s=sizes, alpha=def_alpha)
+	elif marker_style == "pixel":
+		plt.scatter(xlist, ylist, s=sizes, alpha=def_alpha)
+	elif marker_style == "point":
+		plt.scatter(xlist, ylist, s=sizes, alpha=def_alpha)
+	elif marker_style == "x":
+		plt.scatter(xlist, ylist, s=sizes, alpha=def_alpha)
+	elif marker_style == "line":
+		plt.scatter(xlist, ylist, s=sizes, alpha=def_alpha)
+	elif marker_style == "triangle":
+		plt.scatter(xlist, ylist, s=sizes, alpha=def_alpha)
+	else:
+		plt.scatter(xlist, ylist, s=sizes, alpha=def_alpha)
+
+
 def set_label(axis_name, label):
 	if axis_name == "x":
 		plt.xlabel(label)
