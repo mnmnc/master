@@ -1,33 +1,36 @@
 
 from ftools import csv_list as c2l
 from ftools import pcap_csv as p2c
+from plotter import plotter
 import random
 import matplotlib
 
 
-def process_tcp(tshark_path):
+def process_tcp(tshark_path, pcap_file, csv_file, skip_pcap=False):
 	"""
 	PROCESSING TCP TRAFFIC
 	:param tshark_path:
+	:param pcap_file:
+	:param csv_file:
 	:return:
 	"""
 
-	input = "D:\\2.pcap"
-	output = "D:\\test2.csv"
+	if skip_pcap == False:
+		# PREPARING FOR EXECUTION
+		tshark_command = p2c.build_tshark_command(tshark_path, pcap_file, csv_file, p2c.get_tcp_field_set(), 0)
 
-	# PREPARING FOR EXECUTION
-	tshark_command = p2c.build_tshark_command(tshark_path, input, output, p2c.get_tcp_field_set(), 0)
-
-	# INVOKING TSHARK
-	p2c.execute_tshark(tshark_command)
+		# INVOKING TSHARK
+		p2c.execute_tshark(tshark_command)
 
 	# PARSING CSV
-	headers, data = c2l.parse_file(output, False)
+	headers, data = c2l.parse_file(csv_file, False)
 
+	return headers, data
 	# OPTIONAL PRINT
 	#c2l.print_list_of_lists(data)
 
-	create_unique_data(data)
+
+	#create_unique_data(data)
 
 	# INTERESTING PAIRS
 
@@ -137,15 +140,38 @@ def translate_flag(flag):
 
 	return result
 
+def build_2d(data, attribute_1, attribute_2):
+	xs = []
+	ys = []
+	for row in data:
+		xs.append(row[attribute_1])
+		ys.append(row[attribute_2])
+
+	return xs, ys
 
 def main():
 	random.seed()
+	input_directory = "D:\\Poligon\\input\\"
+	output_directory = "D:\\Poligon\\output\\"
+	input_file = "split_00000_20120316133000.pcap"
+	output_file = "test1.csv"
+	image_output_name = "plotted"
+	image_output_format = ".png"
 	tshark_path = "D:\\Apps\\Wireshark\\tshark.exe"
 
-	# PROCESSING TCP
-	process_tcp(tshark_path)
 
-	#print(translate_flag(12))
+	# PROCESSING TCP
+	headers, data = process_tcp(tshark_path, input_directory + input_file, output_directory + output_file, False)
+
+	# BUILDING 2D DATA
+	xs, ys = build_2d(data, "sport", "deport")
+
+	print(xs)
+	# PLOTTING DATA
+	#plotter.plot(xs, ys, "circle", "r", 0.4)
+
+	# SAVING IMAGE
+	#plotter.save_img(output_directory + image_output_name + image_output_format)
 
 if __name__ == "__main__":
 	main()

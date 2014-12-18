@@ -5,7 +5,7 @@ def save_img(destination_filename):
 	plt.savefig(destination_filename)
 
 
-def scatter_plot(xlist, ylist, marker_style='circle', def_color="r", def_alpha=0.5):
+def plot(xlist, ylist, marker_style='circle', def_color="r", def_alpha=0.5):
 	if marker_style == "circle":
 		plt.plot(xlist, ylist, def_color+'o', alpha=def_alpha)
 	elif marker_style == "pixel":
@@ -65,10 +65,10 @@ def main():
 	out_image = "D:\\out.png"
 	#plt.plot([1,2,3,4], [1,4,9,16], 'ro')
 	set_axis_limit(10,10)
-	plt.plot([1,4,9,16], [1,2,3,4], 'bo', ms=13.0, alpha=0.4)
-	plt.plot([8,4,9,16], [11,14,3,4], 'y^', ms=8.0, alpha=0.4)
-	set_note(4,2,6,6,"test")
-	set_note(4,4,6,6,"test")
+	plot([1,4,9,16], [1,2,3,4], "line", "b", 0.4)
+
+	#plot([8,4,9,16], [11,14,3,4], 'y^', ms=8.0, alpha=0.4)
+
 
 
 	plt.show()
