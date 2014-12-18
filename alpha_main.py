@@ -219,9 +219,10 @@ def main():
 
 	# PLOTTING DATA
 	#plotter.plot(xs, ys, "circle", "r", 0.4)
-	#plotter.set_axis_limit(10000,10000)
+	plotter.set_axis_limit(1000,1000)
 	# PLOTTING DATA WITH MARKER SIZES
-	plotter.plot_with_sizes(xs, ys, sizes, "circle", "r", 0.4)
+	plotter.set_title("Porty przeznaczenia i ilośc pakietów jako wielkość markera")
+	plotter.plot_with_sizes(ys, ys, sizes, "circle", "r", 0.4)
 
 	with open(output_directory + "l.log", "w") as f:
 		for i in range(len(xs)):
