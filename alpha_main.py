@@ -23,7 +23,7 @@ def process_tcp(tshark_path, pcap_file, csv_file, skip_pcap=False):
 		p2c.execute_tshark(tshark_command)
 
 	# PARSING CSV
-	headers, data = c2l.parse_file_new(csv_file, field_list)
+	headers, data = c2l.parse_file(csv_file, field_list)
 
 	return headers, data
 
