@@ -8,7 +8,7 @@ def make_packet(packet_data, field_names):
 			field_names.append(i)
 
 	for i in range(len(field_names)):
-		result.update({(field_names[i]).strip():packet_data[i]})
+		result.update({field_names[i]:packet_data[i]})
 
 	return result
 
@@ -18,6 +18,7 @@ def parse_file(local_file, field_names):
 		CREATES A LIST FOR DATA
 		PARSES CSV FILE AND ADDS DATA TO LISTS
 	"""
+
 	data = []
 	headers = []
 	with open(local_file) as input_file:

@@ -6,18 +6,57 @@ import random
 import matplotlib
 
 
-def process_tcp(tshark_path, pcap_file, csv_file, skip_pcap=False):
+# def process_ip(tshark_path, pcap_file, csv_file, skip_pcap=False):
+# 	"""
+# 	PROCESSING IP TRAFFIC
+# 	:param tshark_path:
+# 	:param pcap_file:
+# 	:param csv_file:
+# 	:return:
+# 	"""
+# 	field_list = []
+# 	if skip_pcap == False:
+# 		# PREPARING FOR EXECUTION
+# 		tshark_command, field_list = p2c.build_tshark_command(tshark_path, pcap_file, csv_file, p2c.get_ip_field_set(), "ip")
+#
+# 		# INVOKING TSHARK
+# 		p2c.execute_tshark(tshark_command)
+#
+# 	# PARSING CSV
+# 	headers, data = c2l.parse_file(csv_file, field_list)
+#
+# 	return headers, data
+
+def process_protocol(protocol, tshark_path, pcap_file, csv_file, skip_pcap=False):
 	"""
-	PROCESSING TCP TRAFFIC
+	PROCESSING IP TRAFFIC
 	:param tshark_path:
 	:param pcap_file:
 	:param csv_file:
 	:return:
 	"""
+	field_set = []
 	field_list = []
 	if skip_pcap == False:
 		# PREPARING FOR EXECUTION
-		tshark_command, field_list = p2c.build_tshark_command(tshark_path, pcap_file, csv_file, p2c.get_tcp_field_set(), "tcp", 0)
+		if protocol == "ip":
+			field_set = p2c.get_ip_field_set()
+		elif protocol == "tcp":
+			field_set = p2c.get_tcp_field_set()
+		elif protocol == "udp":
+			field_set = p2c.get_udp_field_set()
+		elif protocol == "icmp":
+			field_set = p2c.get_icmp_field_set()
+		elif protocol == "frame":
+			field_set = p2c.get_frame_field_set()
+		elif protocol == "dns":
+			field_set = p2c.get_dns_field_set()
+		else:
+			print("[ERR] Unsupported protocol:", protocol)
+
+		tshark_command, field_list = p2c.build_tshark_command(tshark_path, pcap_file,
+																csv_file, field_set,
+																protocol)
 
 		# INVOKING TSHARK
 		p2c.execute_tshark(tshark_command)
@@ -26,6 +65,27 @@ def process_tcp(tshark_path, pcap_file, csv_file, skip_pcap=False):
 	headers, data = c2l.parse_file(csv_file, field_list)
 
 	return headers, data
+
+# def process_tcp(tshark_path, pcap_file, csv_file, skip_pcap=False):
+# 	"""
+# 	PROCESSING TCP TRAFFIC
+# 	:param tshark_path:
+# 	:param pcap_file:
+# 	:param csv_file:
+# 	:return:
+# 	"""
+# 	field_list = []
+# 	if skip_pcap == False:
+# 		# PREPARING FOR EXECUTION
+# 		tshark_command, field_list = p2c.build_tshark_command(tshark_path, pcap_file, csv_file, p2c.get_tcp_field_set(), "tcp")
+#
+# 		# INVOKING TSHARK
+# 		p2c.execute_tshark(tshark_command)
+#
+# 	# PARSING CSV
+# 	headers, data = c2l.parse_file(csv_file, field_list)
+#
+# 	return headers, data
 
 
 def main():
@@ -49,10 +109,28 @@ def main():
 	tshark_path = "D:\\Apps\\Wireshark\\tshark.exe"
 
 	# PROCESSING TCP
-	headers, data = process_tcp(tshark_path, input_directory + input_file4, output_directory + output_file, False)
-
+	headers, data = process_protocol("tcp", tshark_path, input_directory + input_file4, output_directory + output_file, False)
 	print(headers)
 
+	# PROCESSING IP
+	headers, data = process_protocol("ip", tshark_path, input_directory + input_file4, output_directory + output_file, False)
+	print(headers)
+
+	# PROCESSING UDP
+	headers, data = process_protocol("udp", tshark_path, input_directory + input_file4, output_directory + output_file, False)
+	print(headers)
+
+	# PROCESSING ICMP
+	headers, data = process_protocol("icmp", tshark_path, input_directory + input_file4, output_directory + output_file, False)
+	print(headers)
+
+	# PROCESSING IP
+	headers, data = process_protocol("frame", tshark_path, input_directory + input_file4, output_directory + output_file, False)
+	print(headers)
+
+	# PROCESSING IP
+	headers, data = process_protocol("dns", tshark_path, input_directory + input_file4, output_directory + output_file, False)
+	print(headers)
 
 	# BUILDING 2D DATA
 	#xs, ys = build_2d(data, "sport", "deport")
