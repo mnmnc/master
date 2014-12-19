@@ -2,30 +2,10 @@
 from ftools import csv_list as c2l
 from ftools import pcap_csv as p2c
 from plotter import plotter
+from arrtools import arrtools as arr
 import random
 import matplotlib
 
-
-# def process_ip(tshark_path, pcap_file, csv_file, skip_pcap=False):
-# 	"""
-# 	PROCESSING IP TRAFFIC
-# 	:param tshark_path:
-# 	:param pcap_file:
-# 	:param csv_file:
-# 	:return:
-# 	"""
-# 	field_list = []
-# 	if skip_pcap == False:
-# 		# PREPARING FOR EXECUTION
-# 		tshark_command, field_list = p2c.build_tshark_command(tshark_path, pcap_file, csv_file, p2c.get_ip_field_set(), "ip")
-#
-# 		# INVOKING TSHARK
-# 		p2c.execute_tshark(tshark_command)
-#
-# 	# PARSING CSV
-# 	headers, data = c2l.parse_file(csv_file, field_list)
-#
-# 	return headers, data
 
 def process_protocol(protocol, tshark_path, pcap_file, csv_file, skip_pcap=False):
 	"""
@@ -66,27 +46,6 @@ def process_protocol(protocol, tshark_path, pcap_file, csv_file, skip_pcap=False
 
 	return headers, data
 
-# def process_tcp(tshark_path, pcap_file, csv_file, skip_pcap=False):
-# 	"""
-# 	PROCESSING TCP TRAFFIC
-# 	:param tshark_path:
-# 	:param pcap_file:
-# 	:param csv_file:
-# 	:return:
-# 	"""
-# 	field_list = []
-# 	if skip_pcap == False:
-# 		# PREPARING FOR EXECUTION
-# 		tshark_command, field_list = p2c.build_tshark_command(tshark_path, pcap_file, csv_file, p2c.get_tcp_field_set(), "tcp")
-#
-# 		# INVOKING TSHARK
-# 		p2c.execute_tshark(tshark_command)
-#
-# 	# PARSING CSV
-# 	headers, data = c2l.parse_file(csv_file, field_list)
-#
-# 	return headers, data
-
 
 def main():
 	# INIT
@@ -108,29 +67,31 @@ def main():
 	# OTHER VARIABLES
 	tshark_path = "D:\\Apps\\Wireshark\\tshark.exe"
 
-	# PROCESSING TCP
 	headers, data = process_protocol("tcp", tshark_path, input_directory + input_file4, output_directory + output_file, False)
-	print(headers)
+	selected_data = arr.select_from_data(data, [headers[0], headers[2]])
+	print(selected_data)
 
-	# PROCESSING IP
-	headers, data = process_protocol("ip", tshark_path, input_directory + input_file4, output_directory + output_file, False)
-	print(headers)
+	xs = []
+	ys = []
 
-	# PROCESSING UDP
-	headers, data = process_protocol("udp", tshark_path, input_directory + input_file4, output_directory + output_file, False)
-	print(headers)
+	for row in selected_data:
+		## TODO - PARSE TO FLOAT OR CHECK THE ERROR
+		try:
 
-	# PROCESSING ICMP
-	headers, data = process_protocol("icmp", tshark_path, input_directory + input_file4, output_directory + output_file, False)
-	print(headers)
+			xs.append(float(row[0]))
+			ys.append(float(row[1]))
+		except:
+			pass
 
-	# PROCESSING IP
-	headers, data = process_protocol("frame", tshark_path, input_directory + input_file4, output_directory + output_file, False)
-	print(headers)
+	# TESTING
+	if True == False:
+		protocols = ["frame", "ip", "tcp", "udp", "dns", "icmp"]
+		for protocol in protocols:
+			print("[TST] Testing protocol", protocol)
+			headers, data = process_protocol(protocol, tshark_path, input_directory + input_file4, output_directory + output_file, False)
+			print(headers)
 
-	# PROCESSING IP
-	headers, data = process_protocol("dns", tshark_path, input_directory + input_file4, output_directory + output_file, False)
-	print(headers)
+
 
 	# BUILDING 2D DATA
 	#xs, ys = build_2d(data, "sport", "deport")
@@ -143,7 +104,7 @@ def main():
 	#plotter.set_axis_limit(1000,1000)
 	# PLOTTING DATA WITH MARKER SIZES
 	#plotter.set_title("Porty przeznaczenia i liczba pakietów jako wielkość markera")
-	#plotter.plot(xs, ys, "circle", "r", 0.4)
+	plotter.plot(xs, ys, "circle", "r", 0.4)
 	#plotter.plot_with_sizes(xs, ys, sizes, "circle", "r", 0.4)
 
 	# with open(output_directory + "l.log", "w") as f:
