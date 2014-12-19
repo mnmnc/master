@@ -49,7 +49,8 @@ def set_label(axis_name, label):
 
 
 def set_title(title):
-	plt.title(title)
+	font = {'fontname':'Courier New','fontsize':12}
+	plt.title(title, **font)
 
 
 def set_text(x, y, text):

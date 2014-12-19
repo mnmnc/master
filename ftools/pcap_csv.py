@@ -1,6 +1,32 @@
 from subprocess import call, check_output
 
-def build_tshark_command(tshark_path, input_file, output_file, fields, header):
+# FUNCTIONS AVAILABLE
+#
+# build_tshark_command(             # RETURNS COMMAND STRING
+#               [str] tshark_path,
+#               [str] input_file,
+#               [str] output_file,
+#               [str] fields,
+#               [str] filter_req    # REQUIRED FILTER
+#               [int] header        # WHETHER TO INCLUDE HEADER OR NOT
+# )
+#
+# add_field(
+#               [str] fields,
+#               [str] field_cat,
+#               [str] field_name
+# )
+#
+# get_tcp_field_set()               # SOURCE PORT + DESTINATION PORT + FLAGS
+# get_ip_field_set()                # SOURCE IP + DESTINATION IP + TTL
+# get_frame_field_set()             # FRAME NUMBER + FRAME LENGTH + FRAME TIME
+# get_full_field_set()
+# execute_tshark(
+#               [str] tshark_command
+# )
+
+def build_tshark_command(tshark_path, input_file, output_file, fields, filter_req, header):
+	""" PREPARES COMMAND FOR TSHARK EXECUTION """
 	result = ""
 
 	# ADD PATH
@@ -17,6 +43,20 @@ def build_tshark_command(tshark_path, input_file, output_file, fields, header):
 
 	# ADD FIELDS
 	result += fields
+
+	# ADD FILTER
+	filter = ""
+	if filter_req == "tcp":
+		filter += ' -R "(ip.proto == 6)" -2 '
+	elif filter_req == "ip":
+		filter += ' -R "(ip.version == 4)" -2 '
+	elif filter_req == "icmp":
+		filter += ' -R "(ip.proto == 1)" -2 '
+	elif filter_req == "udp":
+		filter += ' -R "(ip.proto == 17)" -2 '
+	elif filter_req == "dns":
+		filter += ' -R "(dns)" -2 '
+	result += filter
 
 	# ADD OUTPUT
 	result += " > " + output_file
@@ -78,9 +118,15 @@ def add_field(fields, field_cat, field_name):
 	return fields
 
 
-def get_tcp_field_set():
+def get_tcp_field_set(fields=""):
 	""" CREATES COLLECTION OF FIELDS COMMON FOR TCP PROTOCOL """
-	fields = ""
+	fields = add_field(fields, "tcp", "src")
+	fields = add_field(fields, "tcp", "dst")
+	fields = add_field(fields, "tcp", "flags")
+	return fields
+
+def get_full_field_set(fields=""):
+	""" CREATES COLLECTION OF FIELDS COMMON FOR TCP PROTOCOL """
 	fields = add_field(fields, "frame", "num")
 	fields = add_field(fields, "frame", "time")
 	fields = add_field(fields, "frame", "len")
@@ -95,17 +141,35 @@ def get_tcp_field_set():
 	fields += ' -R "(ip.proto == 6)" -2 '
 	return fields
 
+def get_ip_field_set(fields=""):
+	""" CREATES COLLECTION OF FIELDS COMMON FOR TCP PROTOCOL """
+	fields = add_field(fields, "ip", "src")
+	fields = add_field(fields, "ip", "dst")
+	fields = add_field(fields, "ip", "ttl")
+	return fields
+
+def get_frame_field_set(fields=""):
+	""" CREATES COLLECTION OF FIELDS COMMON FOR TCP PROTOCOL """
+	fields = add_field(fields, "frame", "num")
+	fields = add_field(fields, "frame", "time")
+	fields = add_field(fields, "frame", "len")
+	return fields
+
 def execute_tshark(tshark_command):
+	""" EXECUTES TSHARK """
 	call(tshark_command, shell=True)
 
 
 def main():
 
 	tshark_path = "D:\\Apps\\Wireshark\\tshark.exe"
-	input = "D:\\2.pcap"
-	output = "D:\\test2.csv"
+	input = "D:\\Poligon\\input\\1.pcap"
+	output = "D:\\Poligon\\output\\testt.csv"
 
-	tshark_command = build_tshark_command(tshark_path, input, output, get_tcp_field_set(), 0)
+	fields = get_frame_field_set()
+	fields = get_ip_field_set(fields)
+
+	tshark_command = build_tshark_command(tshark_path, input, output, fields, "ip", 0)
 
 	print(tshark_command)
 
