@@ -14,24 +14,18 @@ def process_tcp(tshark_path, pcap_file, csv_file, skip_pcap=False):
 	:param csv_file:
 	:return:
 	"""
-
+	field_list = []
 	if skip_pcap == False:
 		# PREPARING FOR EXECUTION
-		tshark_command = p2c.build_tshark_command(tshark_path, pcap_file, csv_file, p2c.get_tcp_field_set(), 0)
+		tshark_command, field_list = p2c.build_tshark_command(tshark_path, pcap_file, csv_file, p2c.get_tcp_field_set(), "tcp", 0)
 
 		# INVOKING TSHARK
 		p2c.execute_tshark(tshark_command)
 
 	# PARSING CSV
-	headers, data = c2l.parse_file(csv_file, False)
+	headers, data = c2l.parse_file_new(csv_file, field_list)
 
 	return headers, data
-
-
-
-
-
-
 
 
 def main():
@@ -55,14 +49,10 @@ def main():
 	tshark_path = "D:\\Apps\\Wireshark\\tshark.exe"
 
 	# PROCESSING TCP
-	headers, data = process_tcp(tshark_path, input_directory + input_file4, output_directory + output_file, True)
+	headers, data = process_tcp(tshark_path, input_directory + input_file4, output_directory + output_file, False)
 
-	attributes = ["sport", "deport", "flags"]
-	arr = build_array_with_attributes(data, attributes)
-	parsed = count_flags_per_port_pair(arr)
+	print(headers)
 
-	for r in parsed:
-		print(r)
 
 	# BUILDING 2D DATA
 	#xs, ys = build_2d(data, "sport", "deport")

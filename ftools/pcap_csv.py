@@ -41,12 +41,17 @@ def build_tshark_command(tshark_path, input_file, output_file, fields, filter_re
 
 	# ADD OUTPUT MODIFIERS
 	if header == 1:
-		result += " -T fields -E header=y -E separator=, -E occurrence=a -E quote=n -t u "
+		result += " -T fields -E header=y -E separator=, -E occurrence=a -E quote=d -t u "
 	else:
-		result += " -T fields -E header=n -E separator=, -E occurrence=a -E quote=n -t u "
+		result += " -T fields -E header=n -E separator=, -E occurrence=a -E quote=d -t u "
 
 	# ADD FIELDS
 	result += fields
+	field_list = fields.split("-e")[1:]
+
+	# GETTING RID OF TRAILING SPACES
+	for i in range(len(field_list)):
+		field_list[i] = (field_list[i]).strip()
 
 	# ADD FILTER
 	filter = ""
@@ -65,7 +70,7 @@ def build_tshark_command(tshark_path, input_file, output_file, fields, filter_re
 	# ADD OUTPUT
 	result += " > " + output_file
 
-	return result
+	return result, field_list
 
 def add_field(fields, field_cat, field_name):
 	""" ADDS FIELD BASED ON CATEGORY AND NAME"""
@@ -230,40 +235,41 @@ def main():
 
 	# TEST FRAME
 	fields = get_frame_field_set()
-	tshark_command = build_tshark_command(tshark_path, input, output, fields, "frame", 0)
+	tshark_command, field_list = build_tshark_command(tshark_path, input, output, fields, "frame", 0)
 	print(tshark_command)
 
 
 	# TEST IP
 	fields = get_ip_field_set()
-	tshark_command = build_tshark_command(tshark_path, input, output, fields, "ip", 0)
+	tshark_command, field_list = build_tshark_command(tshark_path, input, output, fields, "ip", 0)
 	print(tshark_command)
 
 	# TEST TCP
 	fields = get_tcp_field_set()
-	tshark_command = build_tshark_command(tshark_path, input, output, fields, "tcp", 0)
+	tshark_command, field_list = build_tshark_command(tshark_path, input, output, fields, "tcp", 0)
 	print(tshark_command)
 
 	# TEST UDP
 	fields = get_udp_field_set()
-	tshark_command = build_tshark_command(tshark_path, input, output, fields, "udp", 0)
+	tshark_command, field_list = build_tshark_command(tshark_path, input, output, fields, "udp", 0)
 	print(tshark_command)
 
 	# TEST ICMP
 	fields = get_icmp_field_set()
-	tshark_command = build_tshark_command(tshark_path, input, output, fields, "icmp", 0)
+	tshark_command, field_list = build_tshark_command(tshark_path, input, output, fields, "icmp", 0)
 	print(tshark_command)
 
 
 	# TEST DNS
 	fields = get_dns_field_set()
-	tshark_command = build_tshark_command(tshark_path, input, output, fields, "dns", 0)
+	tshark_command, field_list = build_tshark_command(tshark_path, input, output, fields, "dns", 0)
 	print(tshark_command)
 
 	# TEST FULL
 	fields = get_full_field_set()
-	tshark_command = build_tshark_command(tshark_path, input, output, fields, "dns", 0)
+	tshark_command, field_list = build_tshark_command(tshark_path, input, output, fields, "", 0)
 	print(tshark_command)
+	print(field_list)
 
 	# EXECUTE COMMAND
 	#execute_tshark(tshark_command)

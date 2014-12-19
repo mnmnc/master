@@ -13,6 +13,18 @@ def make_packet(packet_data):
 			"flags" : packet_data[8]
 	}
 
+def make_packet_new(packet_data, field_names):
+	"""CREATING PACKET DICTIONARY FROM ROW LIST"""
+	result = {}
+	if len(field_names) == 0:
+		for i in range(len(packet_data)):
+			field_names.append(i)
+
+	for i in range(len(field_names)):
+		result.update({(field_names[i]).strip():packet_data[i]})
+
+	return result
+
 
 def set_header(head):
 	"""CREATES A LIST OF HEADERS' NAMES FROM A LIST"""
@@ -20,6 +32,7 @@ def set_header(head):
 	for i in range(len(head)):
 		result.append(head[i])
 	return result
+
 
 
 def parse_file(local_file, headers=True):
@@ -44,6 +57,23 @@ def parse_file(local_file, headers=True):
 
 	return headers, data
 
+def parse_file_new(local_file, field_names):
+	"""	CREATES A LIST FOR HEADER
+		CREATES A LIST FOR DATA
+		PARSES CSV FILE AND ADDS DATA TO LISTS
+	"""
+	data = []
+	headers = []
+	with open(local_file) as input_file:
+		# READ CSV
+		csv_file = csv.reader(input_file)
+		headers = field_names
+
+		for row in csv_file:
+			data.append(make_packet_new(row, field_names))
+
+	return headers, data
+
 
 def print_list_of_lists(list_of_lists):
 	for inner_list in list_of_lists:
@@ -52,10 +82,13 @@ def print_list_of_lists(list_of_lists):
 
 def main():
 	data = []
-	input = "D:\\test2.csv"
-	headers, data = parse_file(input, False)
+	filter = [' frame.number ', ' frame.time_epoch ', ' frame.len ']
 
-	#print_list_of_lists(data)
+	input = "D:\\Poligon\\output\\testt.csv"
+	headers, data = parse_file_new(input, filter)
+
+	print(headers)
+	print_list_of_lists(data)
 
 if __name__ == "__main__":
 	main()
