@@ -17,10 +17,14 @@ from subprocess import call, check_output
 #               [str] field_name
 # )
 #
-# get_tcp_field_set()               # SOURCE PORT + DESTINATION PORT + FLAGS
-# get_ip_field_set()                # SOURCE IP + DESTINATION IP + TTL
 # get_frame_field_set()             # FRAME NUMBER + FRAME LENGTH + FRAME TIME
-# get_full_field_set()
+# get_ip_field_set()                # SOURCE IP + DESTINATION IP + TTL
+# get_tcp_field_set()               # SOURCE PORT + DESTINATION PORT + FLAGS
+# get_udp_field_set()               # SOURCE PORT + DESTINATION PORT
+# get_icmp_field_set()              # TYPE + CODE
+# get_dns_field_set()               # NAME + TYPE + RESPONSE + DOMAIN
+# get_full_field_set()              # ALL ABOVE
+#
 # execute_tshark(
 #               [str] tshark_command
 # )
@@ -63,7 +67,6 @@ def build_tshark_command(tshark_path, input_file, output_file, fields, filter_re
 
 	return result
 
-
 def add_field(fields, field_cat, field_name):
 	""" ADDS FIELD BASED ON CATEGORY AND NAME"""
 	ip = {
@@ -80,6 +83,20 @@ def add_field(fields, field_cat, field_name):
 		"time": " -e frame.time_epoch",
 		"len": " -e frame.len",
 	    "num": "-e frame.number"
+	}
+	udp = {
+		"src": " -e udp.srcport",
+	    "dst": " -e udp.dstport"
+	}
+	dns = {
+		"name": " -e dns.qry.name",
+		"type": " -e dns.qry.type",
+		"resp": " -e dns.a",
+	    "domain": " -e dns.ptr.domain_name"
+	}
+	icmp = {
+		"type": " -e icmp.type",
+		"code": " -e icmp.code"
 	}
 
 	if field_cat == "ip":
@@ -115,8 +132,38 @@ def add_field(fields, field_cat, field_name):
 		else:
 			print("Error. Adding", field_cat, "field unsuccessful. No such field: ", field_name)
 
-	return fields
+	if field_cat == "udp":
+		# Available: src, dst
+		if field_name == "src":
+			fields += udp["src"]
+		elif field_name == "dst":
+			fields += udp["dst"]
+		else:
+			print("Error. Adding", field_cat, "field unsuccessful. No such field: ", field_name)
 
+	if field_cat == "dns":
+		# Available: name, type, resp, domain
+		if field_name == "name":
+			fields += dns["name"]
+		elif field_name == "type":
+			fields += dns["type"]
+		elif field_name == "resp":
+			fields += dns["resp"]
+		elif field_name == "domain":
+			fields += dns["domain"]
+		else:
+			print("Error. Adding", field_cat, "field unsuccessful. No such field: ", field_name)
+
+	if field_cat == "icmp":
+		# Available: code, type
+		if field_name == "code":
+			fields += icmp["code"]
+		elif field_name == "type":
+			fields += icmp["type"]
+		else:
+			print("Error. Adding", field_cat, "field unsuccessful. No such field: ", field_name)
+
+	return fields
 
 def get_tcp_field_set(fields=""):
 	""" CREATES COLLECTION OF FIELDS COMMON FOR TCP PROTOCOL """
@@ -127,18 +174,13 @@ def get_tcp_field_set(fields=""):
 
 def get_full_field_set(fields=""):
 	""" CREATES COLLECTION OF FIELDS COMMON FOR TCP PROTOCOL """
-	fields = add_field(fields, "frame", "num")
-	fields = add_field(fields, "frame", "time")
-	fields = add_field(fields, "frame", "len")
-	fields = add_field(fields, "ip", "src")
-	fields = add_field(fields, "ip", "dst")
-	fields = add_field(fields, "tcp", "src")
-	fields = add_field(fields, "tcp", "dst")
-	fields = add_field(fields, "ip", "ttl")
-	fields = add_field(fields, "tcp", "flags")
 
-	# LIMIT TO TCP ONLY
-	fields += ' -R "(ip.proto == 6)" -2 '
+	fields = get_frame_field_set(fields)
+	fields = get_ip_field_set(fields)
+	fields = get_tcp_field_set(fields)
+	fields = get_udp_field_set(fields)
+	fields = get_icmp_field_set(fields)
+	fields = get_dns_field_set(fields)
 	return fields
 
 def get_ip_field_set(fields=""):
@@ -155,6 +197,26 @@ def get_frame_field_set(fields=""):
 	fields = add_field(fields, "frame", "len")
 	return fields
 
+def get_udp_field_set(fields=""):
+	""" CREATES COLLECTION OF FIELDS COMMON FOR udp PROTOCOL """
+	fields = add_field(fields, "udp", "src")
+	fields = add_field(fields, "udp", "dst")
+	return fields
+
+def get_icmp_field_set(fields=""):
+	""" CREATES COLLECTION OF FIELDS COMMON FOR udp PROTOCOL """
+	fields = add_field(fields, "icmp", "code")
+	fields = add_field(fields, "icmp", "type")
+	return fields
+
+def get_dns_field_set(fields=""):
+	""" CREATES COLLECTION OF FIELDS COMMON FOR udp PROTOCOL """
+	fields = add_field(fields, "dns", "name")
+	fields = add_field(fields, "dns", "type")
+	fields = add_field(fields, "dns", "resp")
+	fields = add_field(fields, "dns", "domain")
+	return fields
+
 def execute_tshark(tshark_command):
 	""" EXECUTES TSHARK """
 	call(tshark_command, shell=True)
@@ -166,23 +228,49 @@ def main():
 	input = "D:\\Poligon\\input\\1.pcap"
 	output = "D:\\Poligon\\output\\testt.csv"
 
+	# TEST FRAME
 	fields = get_frame_field_set()
-	fields = get_ip_field_set(fields)
+	tshark_command = build_tshark_command(tshark_path, input, output, fields, "frame", 0)
+	print(tshark_command)
 
+
+	# TEST IP
+	fields = get_ip_field_set()
 	tshark_command = build_tshark_command(tshark_path, input, output, fields, "ip", 0)
+	print(tshark_command)
 
+	# TEST TCP
+	fields = get_tcp_field_set()
+	tshark_command = build_tshark_command(tshark_path, input, output, fields, "tcp", 0)
+	print(tshark_command)
+
+	# TEST UDP
+	fields = get_udp_field_set()
+	tshark_command = build_tshark_command(tshark_path, input, output, fields, "udp", 0)
+	print(tshark_command)
+
+	# TEST ICMP
+	fields = get_icmp_field_set()
+	tshark_command = build_tshark_command(tshark_path, input, output, fields, "icmp", 0)
+	print(tshark_command)
+
+
+	# TEST DNS
+	fields = get_dns_field_set()
+	tshark_command = build_tshark_command(tshark_path, input, output, fields, "dns", 0)
+	print(tshark_command)
+
+	# TEST FULL
+	fields = get_full_field_set()
+	tshark_command = build_tshark_command(tshark_path, input, output, fields, "dns", 0)
 	print(tshark_command)
 
 	# EXECUTE COMMAND
-	execute_tshark(tshark_command)
+	#execute_tshark(tshark_command)
 
 	#out = check_output("type pcap_csv.py", shell=True)
 	#print(out.decode(encoding='utf-8'))
 
-
-
-	pass
-#tshark -T fields -E header=y -E separator=, -E occurrence=a -E quote=d -e ip.proto -e ip.src -e ip.dst
 
 if __name__ == "__main__":
 	main()
