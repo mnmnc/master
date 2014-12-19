@@ -53,21 +53,26 @@ def main():
 
 	# INPUT
 	input_directory = "D:\\Poligon\\input\\"
+	input_directory = "E:\\SQL_PROJECTS\\Poligon\\input\\"
 	input_file = "smaller_00000_20120316133000.pcap"
 	input_file2 = "smaller_00001_20120316133058.pcap"
 	input_file3 = "smaller_00002_20120316134254.pcap"
 	input_file4 = "smaller_00003_20120316134304.pcap"
+	input_file5 = "1.pcap"
 
 	# OUTPUT
 	output_directory = "D:\\Poligon\\output\\"
+	output_directory = "E:\\SQL_PROJECTS\\Poligon\\output\\"
 	output_file = "test1.csv"
 	image_output_name = "plotted"
 	image_output_format = ".png"
 
 	# OTHER VARIABLES
 	tshark_path = "D:\\Apps\\Wireshark\\tshark.exe"
+	tshark_path = "C:\\tshark.exe"
 
-	headers, data = process_protocol("tcp", tshark_path, input_directory + input_file4, output_directory + output_file, False)
+
+	headers, data = process_protocol("tcp", tshark_path, input_directory + input_file5, output_directory + output_file, False)
 	selected_data = arr.select_from_data(data, [headers[0], headers[2]])
 	print(selected_data)
 
@@ -76,12 +81,17 @@ def main():
 
 	for row in selected_data:
 		## TODO - PARSE TO FLOAT OR CHECK THE ERROR
+		x = -1
+		y = -1
 		try:
-
-			xs.append(float(row[0]))
-			ys.append(float(row[1]))
+			x = float(row[0])
+			y = float(row[1])
 		except:
 			pass
+		if x is not -1 and y is not -1:
+			xs.append(float(row[0]))
+			ys.append(float(row[1]))
+
 
 	# TESTING
 	if True == False:
@@ -91,7 +101,8 @@ def main():
 			headers, data = process_protocol(protocol, tshark_path, input_directory + input_file4, output_directory + output_file, False)
 			print(headers)
 
-
+	print(xs)
+	print(ys)
 
 	# BUILDING 2D DATA
 	#xs, ys = build_2d(data, "sport", "deport")
@@ -114,7 +125,8 @@ def main():
 
 
 	# SAVING IMAGE
-	#plotter.save_img(output_directory + image_output_name + image_output_format)
+
+	plotter.save_img(output_directory + image_output_name + image_output_format)
 
 if __name__ == "__main__":
 	main()
