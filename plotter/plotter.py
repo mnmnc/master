@@ -2,10 +2,14 @@ import matplotlib.pyplot as plt
 
 
 def save_img(destination_filename):
-	fig = plt.gcf()
-	fig.set_size_inches(18.5,18.5)
+	#fig = plt.gcf()
+	#fig.set_size_inches(18.5,18.5)
 	plt.savefig(destination_filename,dpi=200)
 
+def save_img_csize(destination_filename, width, height, local_dpi=200):
+	fig = plt.gcf()
+	fig.set_size_inches(width, height)
+	plt.savefig(destination_filename,dpi=local_dpi)
 
 def plot(xlist, ylist, marker_style='circle', def_color="r", def_alpha=0.5):
 	if marker_style == "circle":

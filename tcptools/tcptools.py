@@ -63,7 +63,8 @@ def flags_to_flag_list(flags):
 
 
 def main():
-	print(flags_to_flag_list(2**12))
+
+	print(flags_to_flag_list(2242))
 	pass
 
 if __name__ == "__main__":

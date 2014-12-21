@@ -54,15 +54,18 @@ def main():
 	# INPUT
 	input_directory = "D:\\Poligon\\input\\"
 	input_directory = "E:\\SQL_PROJECTS\\Poligon\\input\\"
+	input_directory = "/home/x/projects/poligon/input/"
+
 	input_file = "smaller_00000_20120316133000.pcap"
 	input_file2 = "smaller_00001_20120316133058.pcap"
 	input_file3 = "smaller_00002_20120316134254.pcap"
-	input_file4 = "smaller_00003_20120316134304.pcap"
+	input_file4 = "smaller_00003_20120316134407.pcap"
 	input_file5 = "1.pcap"
 
 	# OUTPUT
 	output_directory = "D:\\Poligon\\output\\"
 	output_directory = "E:\\SQL_PROJECTS\\Poligon\\output\\"
+	output_directory = "/home/x/projects/poligon/output/"
 	output_file = "test1.csv"
 	image_output_name = "plotted"
 	image_output_format = ".png"
@@ -70,9 +73,10 @@ def main():
 	# OTHER VARIABLES
 	tshark_path = "D:\\Apps\\Wireshark\\tshark.exe"
 	tshark_path = "C:\\tshark.exe"
+	tshark_path = "tshark"
 
 
-	headers, data = process_protocol("tcp", tshark_path, input_directory + input_file5, output_directory + output_file, False)
+	headers, data = process_protocol("tcp", tshark_path, input_directory + input_file4, output_directory + output_file, False)
 	selected_data = arr.select_from_data(data, [headers[0], headers[2]])
 	print(selected_data)
 
@@ -80,7 +84,6 @@ def main():
 	ys = []
 
 	for row in selected_data:
-		## TODO - PARSE TO FLOAT OR CHECK THE ERROR
 		x = -1
 		y = -1
 		try:
@@ -112,7 +115,7 @@ def main():
 
 	# PLOTTING DATA
 
-	#plotter.set_axis_limit(1000,1000)
+	plotter.set_axis_limit(65535,33)
 	# PLOTTING DATA WITH MARKER SIZES
 	#plotter.set_title("Porty przeznaczenia i liczba pakietów jako wielkość markera")
 	plotter.plot(xs, ys, "circle", "r", 0.4)
@@ -122,11 +125,36 @@ def main():
 	# 	for i in range(len(xs)):
 	# 		f.write(str(xs[i]) + "-" + str(ys[i]) + " -> " + str(sizes[i]) + "\n")
 
+	with open(output_directory + "log.txt", "w") as f:
+		ux = []
+		uy = []
+		for i in range(len(xs)):
+			if xs[i] not in ux:
+				ux.append(xs[i])
+			if ys[i] not in uy:
+				uy.append(ys[i])
 
+		for i in range(len(uy)):
+			f.write(str(uy[i]) + "\n")
 
 	# SAVING IMAGE
 
-	plotter.save_img(output_directory + image_output_name + image_output_format)
+	#plotter.save_img(output_directory + image_output_name + image_output_format)
+	plotter.set_label("x", headers[0])
+	plotter.set_label("y", headers[2])
+	plotter.set_text(3000, 1, "FIN")
+	plotter.set_text(5000, 2, "SYN")
+	plotter.set_text(3000, 4, "RST")
+	plotter.set_text(3000, 8, "PSH")
+	plotter.set_text(3000, 16, "ACK")
+	plotter.set_text(3000, 32, "URG")
+
+
+
+
+
+	plotter.save_img_csize(output_directory + image_output_name + image_output_format, 10, 5, 200)
+
 
 if __name__ == "__main__":
 	main()
