@@ -1,1 +1,5 @@
 .idea/*
+*.pyc
+*.pyc
+ftools/__pycache__/csv_list.cpython-34.pyc
+ftools/__pycache__/pcap_csv.cpython-34.pyc
