@@ -88,13 +88,14 @@ def work_main():
 	# EXECUTION
 	headers, data = process_protocol("tcp", tshark_path, input_directory + input_file, output_directory + output_file, False)
 
+	print(headers)
 	# BUILDING [ number of packets per (source port) x (destination port) ]
 	#xs, ys, sizes = build_2d_with_number_of_packets_per_pair(data, "sport", "deport")
 
 	# plotter.set_title("Porty przeznaczenia i liczba pakietów jako wielkość markera")
 	# plotter.plot(xs, ys, "circle", "r", 0.4)
 	# plotter.plot_with_sizes(xs, ys, sizes, "circle", "r", 0.4)
-	# plotter.save_img_csize(output_directory + image_output_name + image_output_format, 10, 5, 200)
+	# plotter.save(destination_filename=output_directory + image_output_name + image_output_format, width=10, height5, local_dpi=200)
 
 
 def linux_main():
@@ -121,7 +122,7 @@ def linux_main():
 	# plotter.set_title("Porty przeznaczenia i liczba pakietów jako wielkość markera")
 	# plotter.plot(xs, ys, "circle", "r", 0.4)
 	# plotter.plot_with_sizes(xs, ys, sizes, "circle", "r", 0.4)
-	# plotter.save_img_csize(output_directory + image_output_name + image_output_format, 10, 5, 200)
+	# plotter.save(destination_filename=output_directory + image_output_name + image_output_format, width=10, height5, local_dpi=200)
 
 def main():
 	# INIT
