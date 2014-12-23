@@ -42,6 +42,52 @@ def create_distance_dictionary(points):
 		for k in neighbours[key]:
 			print("\t",k,"\t:", neighbours[key][k])
 
+	return neighbours
+
+
+def get_knn(neighbours=None, k=3):
+	k_distances = {}
+	for key in neighbours:
+		k_closest = []
+		temp_values = []
+		for subkey in neighbours[key]:
+			temp_values.append(neighbours[key][subkey])
+
+
+		temp_values.sort()
+		#print(temp_values)
+
+		threshold_value = temp_values[k-1]
+		print(key,", threashold: ", threshold_value)
+
+		for subkey in neighbours[key]:
+			if neighbours[key][subkey] <= threshold_value:
+				k_closest.append(subkey)
+
+		selected_dictionary = {}
+		for k_closest_neighbour in k_closest:
+			for subkey in neighbours[key]:
+				if k_closest_neighbour == subkey:
+					selected_dictionary.update({subkey:neighbours[key][subkey]})
+
+		k_distances.update({key:selected_dictionary})
+
+	for key in k_distances:
+		print("\n",key,"\t:\n")
+		for subkey in k_distances[key]:
+			print("\t",subkey,"\t:", k_distances[key][subkey])
+
+	return k_distances
+
+def calculate_local_reachability_density(distances):
+	lrd_dictionary = {}
+
+	for key in distances:
+		list_size = len(distances[key])
+		sum = 0
+		for subkey in distances[key]:
+			bigger = 0
+
 
 
 def main():
@@ -50,8 +96,8 @@ def main():
 	ys = [5,4,6,37,2,5,3,4,8]
 
 	points = create_points_list(xs, ys)
-	create_distance_dictionary(points)
-
+	neighbours = create_distance_dictionary(points)
+	get_knn(neighbours)
 
 if __name__ == "__main__":
 	main()
